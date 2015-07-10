@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>FileSystemJS Demo</title>
+  <script src="./FileSystem.js"></script>
+</head>
+<body>
+
+  <h3>We are going to save the below smiley into the file system!</h3>
+  <a>Make sure to accept the request to save to your file system, when it pops up!!</a>
+  <br/>
+  <br/>
+  <br/>
+  <canvas id="canvas" width="150" height="150"></canvas>
+  <script>
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+    var centerX = canvas.width / 2;
+    var centerY = canvas.height / 2;
+    var radius = 70;
+    var eyeRadius = 10;
+    var eyeXOffset = 25;
+    var eyeYOffset = 20;
+
+    // draw the yellow circle
+    context.beginPath();
+    context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+    context.fillStyle = 'yellow';
+    context.fill();
+    context.lineWidth = 5;
+    context.strokeStyle = 'black';
+    context.stroke();
+
+    // draw the eyes
+    context.beginPath();
+    var eyeX = centerX - eyeXOffset;
+    var eyeY = centerY - eyeXOffset;
+    context.arc(eyeX, eyeY, eyeRadius, 0, 2 * Math.PI, false);
+    var eyeX = centerX + eyeXOffset;
+    context.arc(eyeX, eyeY, eyeRadius, 0, 2 * Math.PI, false);
+    context.fillStyle = 'black';
+    context.fill();
+
+    // draw the mouth
+    context.beginPath();
+    context.arc(centerX, centerY, 50, 0, Math.PI, false);
+    context.stroke();
+
+    //"It's business time" -Flight of the Conchords
+    //initialize the FileSystemAPI
+    var dataURL = canvas.toDataURL('image/png');
+
+    FileSystem.init(8*1024*1024, function(){
+
+      var data = atob( dataURL.substring( "data:image/png;base64,".length ) ),
+          asArray = new Uint8Array(data.length);
+
+      for( var i = 0, len = data.length; i < len; ++i ) {
+          asArray[i] = data.charCodeAt(i);
+      }
+
+      var blob = new Blob( [ asArray.buffer ], {type: "image/png"} );
+
+      FileSystem.createFile('test.png', blob);
+    });
+
+  </script>
+
+
+</body>
+</html>
